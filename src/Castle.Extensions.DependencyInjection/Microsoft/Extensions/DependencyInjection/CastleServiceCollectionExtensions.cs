@@ -9,6 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class CastleCoreServiceCollectionExtensions
     {
+        private static IDictionary<Type, IEnumerable<Type>> ConstructorParas = new Dictionary<Type, IEnumerable<Type>>();
         /// <summary>
         /// 因为是使用替换的方式，所以必须要放到最后 galoS@2024-1-11 19:22:28
         /// </summary>
@@ -57,16 +58,21 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        private static object BuildProxy(IServiceProvider sp, Type serviceType, Type? implementationType)
+        private static object BuildProxy(IServiceProvider sp, Type serviceType, Type implementationType)
         {
             var generator = sp.GetRequiredService<ProxyGenerator>();
             #region 当前服务类是否有注入 galoS@2024-1-11 17:53:14
             var constructorArgs = new object[] { };
-            if (implementationType.GetConstructors().Any(i => i.GetParameters().Any()))
+
+            if (!ConstructorParas.TryGetValue(implementationType, out var paraTypes))
             {
-                var paraTypes = implementationType.GetConstructors().Where(i => i.GetParameters().Any()).SelectMany(i => i.GetParameters().Select(para => para.ParameterType));
-                constructorArgs = paraTypes.Select(i => sp.GetRequiredService(i)).ToArray();
+                IEnumerable<Type> @new = new List<Type>();
+                if (implementationType.GetConstructors().Any(i => i.GetParameters().Any()))
+                    @new = implementationType.GetConstructors().Where(i => i.GetParameters().Any()).SelectMany(i => i.GetParameters().Select(para => para.ParameterType));
+                ConstructorParas.TryAdd(implementationType, @new);
+                paraTypes = @new;
             }
+            constructorArgs = paraTypes.Select(i => sp.GetRequiredService(i)).ToArray();
             #endregion
 
             var interceptors = GetInterceptors(serviceType, sp);//获取拦截器 galoS@2024-1-12 14:47:47

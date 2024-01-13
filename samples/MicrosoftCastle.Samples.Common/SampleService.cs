@@ -24,7 +24,7 @@ namespace MicrosoftCastle.Samples.Common
 
     public interface ISampleService
     {
-        [CatchLoggingInterceptor]
+        //[CatchLoggingInterceptor]
         Task<string> ShowAsync();
     }
 }

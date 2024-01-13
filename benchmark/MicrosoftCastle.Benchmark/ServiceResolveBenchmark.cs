@@ -20,16 +20,23 @@ namespace MicrosoftCastle.Benchmark
         {
             var services = new ServiceCollection()
                 .AddLogging();
+            services.TryAddTransient<ISampleService,SampleService>();
             services.TryAddTransient<SampleService>();
             services.TryAddTransient<LoggingInterceptor>();//有依赖容器服务的拦截器，需要放到容器中
             _normal = services.BuildServiceProvider();
             _proxy = services.ConfigureCastleDynamicProxy().BuildServiceProvider();
         }
 
-        [Benchmark(Baseline = true)]
+        [Benchmark]
         public SampleService Normal() => _normal.GetRequiredService<SampleService>();
 
         [Benchmark]
         public SampleService DynamicProxy() => _proxy.GetRequiredService<SampleService>();
+
+        [Benchmark]
+        public ISampleService Normal1() => _proxy.GetRequiredService<ISampleService>();
+
+        [Benchmark]
+        public ISampleService DynamicProxy1() => _proxy.GetRequiredService<ISampleService>();
     }
 }
