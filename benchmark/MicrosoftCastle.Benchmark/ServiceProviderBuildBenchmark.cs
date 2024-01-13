@@ -17,7 +17,8 @@ namespace MicrosoftCastle.Benchmark
         private IServiceCollection _services;
         public ServiceProviderBuildBenchmark()
         {
-            _services = new ServiceCollection();
+            _services = new ServiceCollection()
+                .AddLogging();
             _services.TryAddTransient<SampleService>();
             _services.TryAddTransient<LoggingInterceptor>();//有依赖容器服务的拦截器，需要放到容器中
         }

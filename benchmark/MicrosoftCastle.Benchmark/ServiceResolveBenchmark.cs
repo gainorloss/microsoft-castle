@@ -18,7 +18,8 @@ namespace MicrosoftCastle.Benchmark
         private IServiceProvider _proxy;
         public ServiceResolveBenchmark()
         {
-            var services = new ServiceCollection();
+            var services = new ServiceCollection()
+                .AddLogging();
             services.TryAddTransient<SampleService>();
             services.TryAddTransient<LoggingInterceptor>();//有依赖容器服务的拦截器，需要放到容器中
             _normal = services.BuildServiceProvider();
