@@ -69,12 +69,13 @@ namespace Microsoft.Extensions.DependencyInjection
             }
             #endregion
 
-            var instance = ActivatorUtilities.CreateInstance(sp, implementationType, constructorArgs);//ActivatorUtilities 获取 实例 galoS@2024-1-13 21:40:58
             var interceptors = GetInterceptors(serviceType, sp);//获取拦截器 galoS@2024-1-12 14:47:47
 
             var proxy = serviceType.IsClass
             ? generator.CreateClassProxy(serviceType, constructorArgs, interceptors.ToArray())
-            : generator.CreateInterfaceProxyWithTarget(serviceType, instance, interceptors.ToArray());
+            : generator.CreateInterfaceProxyWithTarget(serviceType
+            , ActivatorUtilities.CreateInstance(sp, implementationType, constructorArgs)//ActivatorUtilities 获取 实例 galoS@2024-1-13 21:40:58
+            , interceptors.ToArray());
             return proxy;
         }
 
