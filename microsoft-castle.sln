@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Castle.Extensions.Dependenc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftCastle.ConsoleApp", "samples\MicrosoftCastle.ConsoleApp\MicrosoftCastle.ConsoleApp.csproj", "{74150596-7D17-4C93-BE32-2D52E64EA9AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrosoftCastle.Hosting.ConsoleApp", "samples\MicrosoftCastle.Hosting.ConsoleApp\MicrosoftCastle.Hosting.ConsoleApp.csproj", "{EC716166-E546-445D-8271-E8673CEFBE45}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftCastle.Hosting.ConsoleApp", "samples\MicrosoftCastle.Hosting.ConsoleApp\MicrosoftCastle.Hosting.ConsoleApp.csproj", "{EC716166-E546-445D-8271-E8673CEFBE45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrosoftCastle.Samples.Common", "samples\MicrosoftCastle.Samples.Common\MicrosoftCastle.Samples.Common.csproj", "{1A5614AD-D6D1-4E29-911C-4948D0F5795B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftCastle.Samples.Common", "samples\MicrosoftCastle.Samples.Common\MicrosoftCastle.Samples.Common.csproj", "{1A5614AD-D6D1-4E29-911C-4948D0F5795B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{48F62F5B-6F33-4AD5-8B63-59BEDC8407C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrosoftCastle.Benchmark", "benchmark\MicrosoftCastle.Benchmark\MicrosoftCastle.Benchmark.csproj", "{0F8FDECE-1D5B-4198-AF5E-1BC5FEC00AC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{1A5614AD-D6D1-4E29-911C-4948D0F5795B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A5614AD-D6D1-4E29-911C-4948D0F5795B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A5614AD-D6D1-4E29-911C-4948D0F5795B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F8FDECE-1D5B-4198-AF5E-1BC5FEC00AC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F8FDECE-1D5B-4198-AF5E-1BC5FEC00AC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F8FDECE-1D5B-4198-AF5E-1BC5FEC00AC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F8FDECE-1D5B-4198-AF5E-1BC5FEC00AC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
