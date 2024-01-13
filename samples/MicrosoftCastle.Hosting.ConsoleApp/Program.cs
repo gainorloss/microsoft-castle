@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Castle.Core.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MicrosoftCastle.ConsoleApp;
 using MicrosoftCastle.Samples.Common;
 
@@ -15,7 +17,8 @@ namespace MicrosoftCastle.Hosting.ConsoleApp
                     .ConfigureServices((ctx, services) =>
                     {
                         services.AddLogging();//此处添加日志服务 伪代码 以便获取ILogger<SampleService>
-                        services.TryAddTransient<SampleService>();
+                        services.TryAddTransient<SampleService>(sp => new SampleService(sp.GetRequiredService<ILogger<SampleService>>()));
+                        //services.TryAddTransient<SampleService>();
                         services.TryAddTransient<ISampleService, SampleService>();
                         services.TryAddTransient<LoggingInterceptor>();//有依赖容器服务的拦截器，需要放到容器中
                         services.AddHostedService<Bootstrapper>();
@@ -37,8 +40,15 @@ namespace MicrosoftCastle.Hosting.ConsoleApp
             using (var scope = _scopeFactory.CreateScope())
             {
                 var sp = scope.ServiceProvider;
-                var proxy = sp.GetRequiredService<SampleService>();
-                var name = await proxy.ShowAsync();
+                {
+                    var proxy = sp.GetRequiredService<SampleService>();
+                    var name = await proxy.ShowAsync();
+                }
+
+                {
+                    var proxy = sp.GetRequiredService<ISampleService>();
+                    var name = await proxy.ShowAsync();
+                }
             }
         }
     }

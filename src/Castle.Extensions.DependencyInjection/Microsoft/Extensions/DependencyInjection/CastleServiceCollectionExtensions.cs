@@ -28,66 +28,54 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var lifetime = descriptor.Lifetime;
 
-                Func<IServiceProvider, object>? implementationFactory = null;
                 if (descriptor.ImplementationType != null)
                 {
-                    implementationFactory = sp =>
-                    {
-                        var generator = sp.GetRequiredService<ProxyGenerator>();
-
-                        #region 当前服务类是否有注入 galoS@2024-1-11 17:53:14
-                        var constructorArgs = new object[] { };
-                        if (descriptor.ServiceType.GetConstructors().Any(i => i.GetParameters().Any()))
-                        {
-                            var paraTypes = descriptor.ServiceType.GetConstructors().Where(i => i.GetParameters().Any()).SelectMany(i => i.GetParameters().Select(para => para.ParameterType));
-                            constructorArgs = paraTypes.Select(i => sp.GetRequiredService(i)).ToArray();
-                        }
-                        #endregion
-                        var interceptors = GetInterceptors(descriptor.ServiceType, sp);//获取拦截器 galoS@2024-1-12 14:47:47
-
-                        var proxy = descriptor.ServiceType.IsClass
-                        ? generator.CreateClassProxy(descriptor.ServiceType, constructorArgs, interceptors.ToArray())
-                        : generator.CreateInterfaceProxyWithoutTarget(descriptor.ServiceType, interceptors.ToArray());
-                        return proxy;
-                    };
-                    services.AddByLifetime(descriptor.ServiceType, implementationFactory, lifetime);
+                    services.AddByLifetime(descriptor.ServiceType
+                        , sp => BuildProxy(sp, descriptor.ServiceType, descriptor.ImplementationType)
+                        , lifetime);
                     services.Remove(descriptor);
                     continue;
                 }
                 if (descriptor.ImplementationInstance != null)
                 {
-                    implementationFactory = sp =>
-                    {
-                        var generator = sp.GetRequiredService<ProxyGenerator>();
-                        var interceptors = GetInterceptors(descriptor.ServiceType, sp);//获取拦截器 galoS@2024-1-12 14:47:47
-                        var proxy = descriptor.ServiceType.IsClass
-                        ? generator.CreateClassProxyWithTarget(descriptor.ServiceType, descriptor.ImplementationInstance, interceptors.ToArray())
-                        : generator.CreateInterfaceProxyWithTarget(descriptor.ServiceType, descriptor.ImplementationInstance, interceptors.ToArray());
-                        return proxy;
-                    };
-                    services.AddByLifetime(descriptor.ServiceType, implementationFactory, lifetime);
+                    services.AddByLifetime(descriptor.ServiceType
+                        , sp => BuildProxy(sp, descriptor.ServiceType, descriptor.ImplementationInstance.GetType())
+                        , lifetime);
                     services.Remove(descriptor);
                     continue;
                 }
                 if (descriptor.ImplementationFactory != null)
                 {
-                    implementationFactory = sp =>
-                    {
-                        var generator = sp.GetRequiredService<ProxyGenerator>();
-                        var interceptors = GetInterceptors(descriptor.ServiceType, sp);//获取拦截器 galoS@2024-1-12 14:47:47
-                        var instance = descriptor.ImplementationFactory(sp);
-                        var proxy = descriptor.ServiceType.IsClass
-                        ? generator.CreateClassProxyWithTarget(descriptor.ServiceType, instance, interceptors.ToArray())
-                        : generator.CreateInterfaceProxyWithTarget(descriptor.ServiceType, instance, interceptors.ToArray());
-                        return proxy;
-                    };
-                    services.AddByLifetime(descriptor.ServiceType, implementationFactory, lifetime);
+                    services.AddByLifetime(descriptor.ServiceType
+                        , sp => BuildProxy(sp, descriptor.ServiceType, descriptor.ImplementationFactory(sp).GetType())
+                        , lifetime);
                     services.Remove(descriptor);
                     continue;
                 }
             }
 
             return services;
+        }
+
+        private static object BuildProxy(IServiceProvider sp, Type serviceType, Type? implementationType)
+        {
+            var generator = sp.GetRequiredService<ProxyGenerator>();
+            #region 当前服务类是否有注入 galoS@2024-1-11 17:53:14
+            var constructorArgs = new object[] { };
+            if (implementationType.GetConstructors().Any(i => i.GetParameters().Any()))
+            {
+                var paraTypes = implementationType.GetConstructors().Where(i => i.GetParameters().Any()).SelectMany(i => i.GetParameters().Select(para => para.ParameterType));
+                constructorArgs = paraTypes.Select(i => sp.GetRequiredService(i)).ToArray();
+            }
+            #endregion
+
+            var instance = ActivatorUtilities.CreateInstance(sp, implementationType, constructorArgs);//ActivatorUtilities 获取 实例 galoS@2024-1-13 21:40:58
+            var interceptors = GetInterceptors(serviceType, sp);//获取拦截器 galoS@2024-1-12 14:47:47
+
+            var proxy = serviceType.IsClass
+            ? generator.CreateClassProxy(serviceType, constructorArgs, interceptors.ToArray())
+            : generator.CreateInterfaceProxyWithTarget(serviceType, instance, interceptors.ToArray());
+            return proxy;
         }
 
         /// <summary>
